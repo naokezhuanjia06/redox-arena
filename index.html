@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>氧化还原竞技场 · 高中化学游戏网站</title>
+<link rel="stylesheet" href="css/style.css?v=1794797981">
+</head>
+<body>
+<div id="app">
+
+  <!-- ===== 顶栏 ===== -->
+  <header class="topbar card">
+    <div class="brand">
+      <div class="logo">⚗️</div>
+      <div>
+        <h1>欢迎，化学探索者</h1>
+        <p class="sub">在游戏中学会氧化还原 · 电子转移守恒</p>
+      </div>
+    </div>
+    <div class="top-right">
+      <button class="xp-pill user-pill" id="id-badge" title="查看我的档案 / 切换账号">🪪 未登录</button>
+      <div class="xp-pill warn-pill hidden" id="storage-warn" title="预览面板禁用了浏览器本地存储：刷新或换标签页后，学生成绩会丢失。请用 Chrome / Edge 直接打开 index.html，或使用发布后的链接。">⚠️ 预览不保存</div>
+      <div class="xp-pill">⭐ 经验值 <b id="xp-total">0</b></div>
+      <button class="icon-btn" id="btn-teacher" title="教师后台（需教师密码）">👩‍🏫</button>
+      <button class="icon-btn" id="btn-kb" title="知识卡片">📖</button>
+      <button class="icon-btn" id="btn-home" title="返回地图">🗺️</button>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- ===== 首页：模式选择（简单 / 困难，JS 渲染） ===== -->
+    <section id="view-home" class="view active"></section>
+
+    <!-- ===== 简单模块页：三大板块（JS 渲染） ===== -->
+    <section id="view-easy" class="view"></section>
+
+    <!-- ===== 困难模块页（JS 渲染） ===== -->
+    <section id="view-hard" class="view"></section>
+
+    <!-- ===== 板块一：四身份速判 ===== -->
+    <section id="view-quick" class="view">
+      <div class="game-head">
+        <button class="back-btn" data-back>← 返回地图</button>
+        <div><h2>⚡ 四身份速判</h2><p class="sub">不限时：判断句是氧化剂 / 还原剂 / 氧化产物 / 还原产物吗？连续答对 8 个过关！</p></div>
+        <div class="head-score" id="quick-score">得分 0</div>
+      </div>
+      <div id="quick-root"></div>
+    </section>
+
+    <!-- ===== 板块一：四槽老虎机 ===== -->
+    <section id="view-slots" class="view">
+      <div class="game-head">
+        <button class="back-btn" data-back>← 返回地图</button>
+        <div><h2>🎰 四槽老虎机</h2><p class="sub">不限时：把 4 张物质卡拖进正确的身份槽，连续答对 7 道过关！</p></div>
+        <div class="head-score" id="slots-score">得分 0</div>
+      </div>
+      <div id="slots-root"></div>
+    </section>
+
+    <!-- ===== 板块三：雷区通行 ===== -->
+    <section id="view-mine" class="view">
+      <div class="game-head">
+        <button class="back-btn" data-back>← 返回地图</button>
+        <div><h2>💣 雷区通行</h2><p class="sub">不限时：背着 2 种离子穿越 5×5 雷区，经过的格子必须与背包全部共存；连续 3 关不踩雷过关！</p></div>
+        <div class="head-score" id="mine-score">得分 0</div>
+      </div>
+      <div id="mine-root"></div>
+    </section>
+
+    <!-- ===== 板块三：离子海关 ===== -->
+    <section id="view-gate" class="view">
+      <div class="game-head">
+        <button class="back-btn" data-back>← 返回地图</button>
+        <div><h2>🛂 离子海关</h2><p class="sub">不限时：离子停在窗口等你判断，拦下会反应的、放行能共存的；连续判断正确 10 个过关！</p></div>
+        <div class="head-score" id="gate-score">得分 0</div>
+      </div>
+      <div id="gate-root"></div>
+    </section>
+
+    <!-- ===== 板块二：净化战场（消消乐） ===== -->
+    <section id="view-grid" class="view">
+      <div class="game-head">
+        <button class="back-btn" data-back>← 返回地图</button>
+        <div><h2>💥 净化战场</h2><p class="sub">不限时：点掉能发生氧化还原的离子对，连续消对 12 对过关，点错只清零连对！</p></div>
+        <div class="head-score" id="grid-score">得分 0</div>
+      </div>
+      <div id="grid-root"></div>
+    </section>
+
+    <!-- ===== 板块二：阶梯夺擂 ===== -->
+    <section id="view-ladder" class="view">
+      <div class="game-head">
+        <button class="back-btn" data-back>← 返回地图</button>
+        <div><h2>🪜 阶梯夺擂</h2><p class="sub">不限时：两张卡比强弱，连对越多差距越小——Lv.4 只差 1 档；连续答对 8 组过关</p></div>
+        <div class="head-score" id="ladder-score">得分 0</div>
+      </div>
+      <div id="ladder-root"></div>
+    </section>
+
+    <!-- ===== 困难模块：价态地图 ===== -->
+    <section id="view-valence" class="view">
+      <div class="game-head">
+        <button class="back-btn" data-back>← 返回地图</button>
+        <div><h2>🗺️ 价态地图</h2><p class="sub">不限时：Fe（0/+2/+3）× Cl（-1/0）二维地图，每条箭头选对试剂（含条件），连续走通 8 条过关！</p></div>
+        <div class="head-score" id="valence-score">得分 0</div>
+      </div>
+      <div id="valence-root"></div>
+    </section>
+
+    <!-- ===== 困难模块：方程式拼装台 ===== -->
+    <section id="view-build" class="view">
+      <div class="game-head">
+        <button class="back-btn" data-back>← 返回地图</button>
+        <div><h2>🧪 方程式拼装台</h2><p class="sub">不限时：打乱的试剂瓶摆成一条横着的方程式，点数字条一键设系数，连续拼对 8 条过关！</p></div>
+        <div class="head-score" id="build-score">得分 0</div>
+      </div>
+      <div id="build-root"></div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ===== 入口门：学生端 / 教师端 ===== -->
+<div id="login-modal" class="login-gate hidden">
+  <div class="login-card card">
+    <div class="login-head">
+      <div class="logo">⚗️</div>
+      <div>
+        <h2>氧化还原竞技场</h2>
+        <p class="sub">先选身份再进站：学生用「班级 + 姓名」登录，老师走教师端</p>
+      </div>
+    </div>
+
+    <p class="login-warn hidden" id="login-storage-note">⚠️ 当前预览环境禁用了浏览器本地存储：这次登录有效、成绩也会记在当前页面，但<b>刷新后会丢失</b>。把网页文件用 Chrome / Edge 直接打开，或发布成链接访问，才能保存到下次登录。</p>
+
+    <!-- 有存档时的「欢迎回来」 -->
+    <div class="login-back hidden" id="login-back">
+      <div class="login-back-info">
+        <p class="login-back-t">👋 欢迎回来</p>
+        <p class="login-back-n" id="login-back-name"></p>
+        <p class="sub" id="login-back-sub"></p>
+      </div>
+      <div class="login-back-btns">
+        <button class="btn btn-primary" id="login-continue">继续上次进度 →</button>
+        <button class="link-btn" id="login-other">不是我？切换其他身份</button>
+      </div>
+    </div>
+
+    <div class="login-cols" id="login-cols">
+      <section class="login-side">
+        <div class="ls-head">
+          <span class="ls-icon">🎓</span>
+          <div>
+            <h3>学生端</h3>
+            <p class="sub">选自己的班级和姓名，所有成绩自动记进个人账号</p>
+          </div>
+        </div>
+        <p class="id-note hidden" id="id-preset-note"></p>
+        <p class="sub hidden" id="id-roster-tip">📢 名册还没有数据：请联系老师导入，或在下面手动填写。</p>
+        <div id="id-pick-area">
+          <div class="id-form login-form">
+            <label id="lab-grade" class="hidden">年级 <select id="sel-grade"></select></label>
+            <label>班级 <select id="sel-class"></select></label>
+            <label>姓名 <select id="sel-name"></select></label>
+          </div>
+          <p class="sub id-hint" id="id-name-hint"></p>
+          <button class="link-btn hidden" id="id-use-free">名单里找不到我？手动填写</button>
+        </div>
+        <div id="id-free-area" class="id-form login-form hidden">
+          <label>年级 <input id="free-grade" placeholder="如：高一"></label>
+          <label>班级 <input id="free-class" placeholder="如：3 班"></label>
+          <label>姓名 <input id="free-name" placeholder="你的姓名"></label>
+        </div>
+        <button class="btn btn-primary btn-block" id="login-student">进入学生端 →</button>
+        <p class="login-tip">成绩、经验值、玩过的游戏都记在这个姓名下，下次登录继续。</p>
+      </section>
+
+      <section class="login-side teacher">
+        <div class="ls-head">
+          <span class="ls-icon">👩‍🏫</span>
+          <div>
+            <h3>教师端</h3>
+            <p class="sub">名册管理 · 班级成绩 · 排行榜 · 数据备份</p>
+          </div>
+        </div>
+        <label class="login-pwd">教师密码
+          <input type="password" id="login-pwd" placeholder="请输入教师密码" autocomplete="current-password">
+        </label>
+        <p class="login-err hidden" id="login-err">❌ 密码不对，请再试一次</p>
+        <button class="btn btn-ghost btn-block" id="login-teacher">进入教师端 →</button>
+        <p class="login-tip">教师端免实名、不计成绩、不上排行榜；密码由任课老师保管。</p>
+      </section>
+    </div>
+  </div>
+</div>
+
+<!-- 我的档案（学生看自己） -->
+<div id="me-modal" class="modal hidden">
+  <div class="modal-card card">
+    <button class="modal-close" id="me-close">✕</button>
+    <h2>👤 我的档案</h2>
+    <div id="me-body"></div>
+    <div class="row mt" style="justify-content:center">
+      <button class="btn btn-ghost" id="me-switch">🔄 切换账号 / 退出</button>
+    </div>
+  </div>
+</div>
+
+<!-- 学生档案（教师查看某位学生） -->
+<div id="stu-modal" class="modal hidden">
+  <div class="modal-card card">
+    <button class="modal-close" id="stu-close">✕</button>
+    <h2 id="stu-title">👤 学生档案</h2>
+    <div id="stu-body"></div>
+  </div>
+</div>
+
+<!-- 知识卡片弹窗 -->
+<div id="kb-modal" class="modal hidden">
+  <div class="modal-card card">
+    <button class="modal-close" id="kb-close">✕</button>
+    <h2>📖 知识卡片</h2>
+    <div id="kb-body"></div>
+  </div>
+</div>
+
+<!-- 教师后台 -->
+<div id="tc-modal" class="modal hidden">
+  <div class="modal-card card wide">
+    <button class="modal-close" id="tc-close">✕</button>
+    <h2>👩‍🏫 教师后台</h2>
+    <p class="sub" id="tc-stat"></p>
+    <p class="id-note warn-note hidden" id="tc-storage-warn">⚠️ <b>当前是预览环境，不保存数据</b>：刷新页面或换一个标签页，学生成绩就会全部消失（所以这里什么都看不到）。
+      正式使用请用 <b>Chrome / Edge 直接打开 index.html</b>，或使用发布后的网址；这样学生的成绩会保留，教师端也能一直查到。</p>
+
+    <div class="lb-tabs tc-tabs" id="tc-tabs">
+      <button class="lb-tab active" data-tctab="overview">🏫 班级总览</button>
+      <button class="lb-tab" data-tctab="students">👤 学生档案</button>
+      <button class="lb-tab" data-tctab="roster">📋 名册管理</button>
+      <button class="lb-tab" data-tctab="rank">🏆 排行榜</button>
+      <button class="lb-tab" data-tctab="data">💾 数据备份</button>
+    </div>
+
+    <!-- 班级总览 -->
+    <div id="tc-pane-overview" class="tc-pane"></div>
+
+    <!-- 学生档案 -->
+    <div id="tc-pane-students" class="tc-pane hidden">
+      <div class="row tc-bar">
+        <label class="tc-filter">班级
+          <select id="tc-class-filter"></select>
+        </label>
+        <label class="tc-filter">排序
+          <select id="tc-sort">
+            <option value="points">按总积分</option>
+            <option value="passed">按过关数</option>
+            <option value="recent">按最近活跃</option>
+            <option value="seq">按名单顺序</option>
+          </select>
+        </label>
+        <input id="tc-search" class="tc-search" placeholder="搜姓名…">
+        <span class="sub" id="tc-count"></span>
+      </div>
+      <div id="tc-table"></div>
+    </div>
+
+    <!-- 名册管理 -->
+    <div id="tc-pane-roster" class="tc-pane hidden">
+      <div class="kb-block">
+        <h3>📋 上传 / 粘贴班级名册</h3>
+        <p class="kb-note">本站已内置 <b>63 级高一年级名单（13 个班 / 667 人）</b>，学生登录时直接选班级 + 姓名。如需增补：先选好<b>年级和班级</b>，再粘贴名单或上传 <b>Excel(.xlsx)</b> / csv / txt；选了班级后只写姓名也能导入。名册保存在本机浏览器，不会丢。</p>
+        <div id="tc-preset-note" class="id-note hidden">✅ 内置年级名单已生效：6301–6313 对应 1班–13班；同班重名用「名单第 N 位」区分，成绩互不覆盖。</div>
+        <div class="row" style="gap:14px;flex-wrap:wrap;margin-top:12px">
+          <label class="tc-filter">导入到 年级
+            <select id="tc-grade"></select>
+          </label>
+          <label class="tc-filter">导入到 班级
+            <select id="tc-class"></select>
+          </label>
+        </div>
+        <textarea id="tc-paste" class="tc-area" placeholder="先选好班级，再粘贴名单（一行一个学生：年级,班级,姓名；选了班级后只写姓名也行）"></textarea>
+        <div class="row mt">
+          <input type="file" id="tc-file" accept=".csv,.txt,.xlsx,.xlsm" class="tc-file">
+          <button class="btn btn-primary" id="tc-import">📥 导入名册</button>
+          <button class="btn btn-ghost" id="tc-restore">↺ 恢复内置年级名单</button>
+          <button class="btn btn-red" id="tc-clear">🗑 清空名册</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 排行榜 -->
+    <div id="tc-pane-rank" class="tc-pane hidden">
+      <div class="lb-tabs" id="tc-lb-tabs"></div>
+      <p class="lb-rule" id="tc-lb-rule"></p>
+      <div id="tc-lb"></div>
+    </div>
+
+    <!-- 数据备份 -->
+    <div id="tc-pane-data" class="tc-pane hidden"></div>
+  </div>
+</div>
+
+<!-- 排行榜弹窗（学生可看） -->
+<div id="lb-modal" class="modal hidden">
+  <div class="modal-card card wide">
+    <button class="modal-close" id="lb-close">✕</button>
+    <h2>🏆 排行榜</h2>
+    <div id="lb-body"></div>
+  </div>
+</div>
+
+<!-- 全局提示 -->
+<div id="toast" class="toast hidden"></div>
+
+<script src="js/data.js?v=1794797981"></script>
+<script src="js/data_eq.js?v=1794797981"></script>
+<script src="js/data_build_bank.js?v=1794797981"></script>
+<script src="js/data_roster.js?v=1794797981"></script>
+<script src="js/core.js?v=1794797981"></script>
+<script src="js/account.js?v=1794797981"></script>
+<script src="js/xlsx.js?v=1794797981"></script>
+<script src="js/roster.js?v=1794797981"></script>
+<script src="js/game_quick.js?v=1794797981"></script>
+<script src="js/game_slots.js?v=1794797981"></script>
+<script src="js/game_gate.js?v=1794797981"></script>
+<script src="js/game_grid.js?v=1794797981"></script>
+<script src="js/game_ladder.js?v=1794797981"></script>
+<script src="js/game_mine.js?v=1794797981"></script>
+<script src="js/game_valence.js?v=1794797981"></script>
+<script src="js/game_build.js?v=1794797981"></script>
+<script src="js/main.js?v=1794797981"></script>
+</body>
+</html>
